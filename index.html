@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Weather Operations Center collaborative shift checklist">
+  <title>Weather Operations Center Shift Checklist</title>
+  <style>
+    :root { --navy:#081f3a; --blue:#0d5b99; --sky:#eaf4fc; --ink:#132233; --muted:#627184; --line:#cbd6e2; --ok:#157347; --warn:#9a6700; --danger:#a61b1b; --panel:#fff; --bg:#f3f6f9; }
+    * { box-sizing: border-box; }
+    body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.45 Arial, Helvetica, sans-serif; }
+    header { background:linear-gradient(120deg,var(--navy),var(--blue)); color:#fff; padding:25px max(20px,calc((100vw - 1300px)/2)); box-shadow:0 2px 7px #0003; }
+    h1 { margin:0 0 5px; font-size:clamp(1.45rem,3vw,2rem); letter-spacing:.15px; }
+    header p { margin:0; color:#deefff; }
+    main { max-width:1300px; margin:22px auto 50px; padding:0 20px; }
+    .notice { background:#fff9df; border-left:5px solid #bc8700; padding:10px 14px; margin:0 0 18px; color:#563d00; font-size:.92rem; }
+    .panel { background:var(--panel); border:1px solid var(--line); border-radius:9px; box-shadow:0 1px 3px #1f29370d; margin-bottom:18px; }
+    .panel h2 { font-size:1.05rem; background:#f4f8fc; border-bottom:1px solid var(--line); padding:10px 14px; margin:0; color:var(--navy); }
+    .panel-body { padding:15px; }
+    .grid { display:grid; grid-template-columns:repeat(4,minmax(160px,1fr)); gap:14px; }
+    .radio-grid { display:grid; grid-template-columns:repeat(2,minmax(280px,1fr)); gap:15px; }
+    .radio-card { border:1px solid var(--line); border-top:4px solid var(--blue); border-radius:6px; padding:13px; background:#fbfdff; }
+    .radio-card h3 { margin:0 0 10px; font-size:1rem; color:var(--navy); }
+    label { display:block; font-weight:700; font-size:.87rem; color:#36495c; }
+    input, select, textarea, button { font:inherit; }
+    input[type=text], input[type=date], select, textarea { width:100%; margin-top:4px; padding:8px 9px; min-height:38px; border:1px solid #aebdcb; border-radius:4px; color:var(--ink); background:#fff; }
+    textarea { min-height:90px; resize:vertical; }
+    input:focus, select:focus, textarea:focus { outline:3px solid #9bc9ec99; border-color:var(--blue); }
+    .toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin:0 0 18px; }
+    .progress-wrap { flex:1; min-width:220px; }
+    .progress-label { display:flex; justify-content:space-between; gap:10px; color:var(--muted); font-size:.9rem; margin-bottom:5px; }
+    progress { width:100%; height:12px; accent-color:var(--ok); }
+    .actions { display:flex; flex-wrap:wrap; gap:8px; }
+    button { border:0; border-radius:4px; padding:9px 13px; cursor:pointer; font-weight:700; }
+    button.primary { background:var(--blue); color:#fff; } button.primary:hover { background:#08477c; }
+    button.secondary { background:#e6edf4; color:var(--navy); } button.secondary:hover { background:#d6e2ed; }
+    button.danger { background:#fff0f0; color:var(--danger); border:1px solid #efbaba; }
+    .sync-badge { font-size:.82rem; font-weight:700; border-radius:99px; padding:5px 10px; background:#e8edf2; color:#3e4b59; white-space:nowrap; }
+    .sync-badge.connected { color:#0d6039; background:#dff5e9; }.sync-badge.error { color:#8b1515; background:#ffe5e5; }
+    .shift-heading { display:flex; align-items:baseline; justify-content:space-between; gap:10px; padding:11px 14px; margin:18px 0 0; background:var(--navy); color:#fff; border-radius:7px 7px 0 0; }
+    .shift-heading h2 { margin:0; font-size:1.1rem; }.shift-heading span { color:#d6e9f8; font-size:.87rem; }
+    .task-list { background:#fff; border:1px solid var(--line); border-top:0; border-radius:0 0 7px 7px; overflow:hidden; }
+    .task { display:grid; grid-template-columns:29px 78px minmax(0,1fr) auto; align-items:start; gap:9px; padding:10px 13px; border-bottom:1px solid #e4e9ee; }
+    .task:last-child { border-bottom:0; }.task:hover { background:#f8fbfd; }.task.done { background:#f1faf5; }
+    .task input[type=checkbox] { appearance:none; width:20px; height:20px; margin:1px 0 0; border:2px solid #6f8194; border-radius:3px; cursor:pointer; background:#fff; }
+    .task input[type=checkbox]:checked { background:var(--ok); border-color:var(--ok); }.task input[type=checkbox]:checked::after { content:'✓'; display:block; color:#fff; font-weight:700; line-height:16px; text-align:center; }
+    .task-time { font-weight:700; color:var(--blue); font-variant-numeric:tabular-nums; }.task-text { min-width:0; }.conditional { color:#7c5400; font-size:.78rem; background:#fff2cf; padding:2px 6px; border-radius:3px; font-weight:700; white-space:nowrap; }
+    .footer-note { color:var(--muted); font-size:.84rem; margin:14px 0 0; }
+    @media (max-width:850px) { .grid { grid-template-columns:repeat(2,minmax(160px,1fr)); }.radio-grid { grid-template-columns:1fr; } }
+    @media (max-width:560px) { main { padding:0 12px; }.grid { grid-template-columns:1fr; }.task { grid-template-columns:29px 65px minmax(0,1fr); }.conditional { grid-column:3; justify-self:start; }.task-text { font-size:.93rem; } }
+    @media print { header { background:#fff!important; color:#000!important; box-shadow:none; padding:0 0 12px; } header p { color:#000; }.notice,.toolbar,.actions,.sync-badge { display:none!important; } body { background:#fff; font-size:11px; } main { max-width:none; margin:0; padding:0; }.panel { box-shadow:none; break-inside:avoid; margin-bottom:10px; }.task { padding:5px 8px; }.shift-heading { background:#fff!important; color:#000!important; border:1px solid #000; border-bottom:0; }.shift-heading span { color:#000; } }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Weather Operations Center — Shift Checklist</h1>
+  <p>Collaborative day/night checklist with client-side PDF export</p>
+</header>
+<main>
+  <div class="notice"><strong>Handling reminder:</strong> Configure shared synchronization only through an organization-approved service. Do not enter CUI, credentials, or sensitive operational details unless the hosting, access, and storage arrangement is authorized.</div>
+
+  <section class="panel" aria-labelledby="shift-info-heading">
+    <h2 id="shift-info-heading">Shift Information</h2>
+    <div class="panel-body grid">
+      <label>Checklist Date<input id="shiftDate" type="date"></label>
+      <label>Shift<select id="shiftType"><option value="day">Day Shift (0600–1800)</option><option value="night">Night Shift (1800–0600)</option></select></label>
+      <label>Shift Supervisor<input id="shiftSupervisor" type="text" autocomplete="off" placeholder="Name / rank"></label>
+      <label>Duty Forecasters<input id="dutyForecasters" type="text" autocomplete="off" placeholder="Names / ranks"></label>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="radio-heading">
+    <h2 id="radio-heading">Radio Checks</h2>
+    <div class="panel-body radio-grid" id="radioChecks"></div>
+  </section>
+
+  <div class="toolbar">
+    <div class="progress-wrap"><div class="progress-label"><span>Checklist Completion</span><strong id="progressText">0 / 0 tasks complete</strong></div><progress id="progressBar" value="0" max="1"></progress></div>
+    <span class="sync-badge" id="syncBadge" title="Live synchronization is disabled until approved Firebase configuration is supplied.">Local-only mode</span>
+    <div class="actions"><button class="secondary" id="markAll" type="button">Mark All Complete</button><button class="primary" id="downloadPdf" type="button">Download Completed PDF</button><button class="danger" id="clearShift" type="button">Clear This Shift</button></div>
+  </div>
+
+  <section id="taskContainer" aria-live="polite"></section>
+
+  <section class="panel" aria-labelledby="notes-heading">
+    <h2 id="notes-heading">Shift Change / Handoff Notes</h2>
+    <div class="panel-body"><label for="shiftNotes">Notes for oncoming shift (optional)<textarea id="shiftNotes" placeholder="Enter handoff notes, outstanding actions, or relevant remarks."></textarea></label><p class="footer-note">This field is included in the downloaded PDF. In shared mode, edits sync to the selected date and shift.</p></div>
+  </section>
+</main>
+
+<script>
+/*
+  OPTIONAL REAL-TIME SYNCHRONIZATION
+  1. Obtain organizational approval for the backend and access model.
+  2. Set enabled: true and replace the placeholder values below with your Firebase web-app configuration.
+  3. Enable Firebase Authentication (recommended) and use restrictive Realtime Database rules.
+  This client syncs every form input. If two users edit the SAME field at the same time, the last saved value wins.
+*/
+const realtimeConfig = {
+  enabled: false,
+  databaseRoot: 'weatherOperationsCenterChecklists',
+  firebaseConfig: {
+    apiKey: 'REPLACE_WITH_APPROVED_VALUE',
+    authDomain: 'REPLACE_WITH_APPROVED_VALUE',
+    databaseURL: 'REPLACE_WITH_APPROVED_VALUE',
+    projectId: 'REPLACE_WITH_APPROVED_VALUE',
+    appId: 'REPLACE_WITH_APPROVED_VALUE'
+  }
+};
+
+const dayTasks = [
+ ['0600','Check MARSS — Actively Monitoring Applicable Alerts'],
+ ['0600','Run MIDDS Command HOWAREWE — Status Current'],
+ ['0600','Check Forecaster Sequencer — Daily Playlist Displaying Correct Products'],
+ ['0600','Ensure KCOF/KXMR/KTTS Obs Longline Dissemination (AWC) — Determine Necessity of Augmentation'],
+ ['0615','Check WXR Email, WXR Calendar, and Personal Email'],
+ ['0615','Verify Previous Shift Publication, Horizontal Consistency (WWAs, 24/7, TAF, MWP), and Fill Out QCC for Previous Shift — Check and Sign Off Current Shift Prior-Day Errors; Check and Sign Off Personal Prior-Day Errors'],
+ ['0730','KSC LWO Tag-Up'],
+ ['0745','Perform Radio Check'],
+ ['0800','QA and Transmit 24-Hour Forecast (0800L) and Weekly Update'],
+ ['0800','Change Display on Daily Playlist MIDDS Satellite Imagery to Visible'],
+ ['0830','Update Cape Status Slides and Report to Briefing by 0900L. Do not leave Ops Floor unmanned; coordinate with upper leadership ahead of time to brief if needed.','Thursdays only'],
+ ['0915','Check Mission Page — Add to METCON if applicable'],
+ ['0930','METCON'],
+ ['0945','Severe Weather Tag-Up Decision — Execute SWAP A-SOP 02 if needed'],
+ ['1040','Check KXMR 15Z Sounding if applicable'],
+ ['1100','QA and Transmit Tropical Distribution Email if needed'],
+ ['1200','QA and Transmit 24-Hour Forecast Update (1200L)'],
+ ['1215','Update Cape Status Slides','Wednesdays only'],
+ ['1400','QA and Transmit 18Z/19Z TAF'],
+ ['1400','QA and Transmit NTAC MWPs if needed'],
+ ['1600','QA and Transmit 24-Hour Forecast Update (1600L)'],
+ ['1700','QA and Transmit Tropical Distribution Email if needed'],
+ ['1700','Vacuum Ops Floor; clean and organize Ops Floor desks; discard unneeded papers','Sundays only'],
+ ['1715','Complete Entering All Required WWA Actions — Justification, Verification, and Checklist Count'],
+ ['1725','Verify GitHub Products Current — Delete Old Products'],
+ ['1730','Verify and Complete Admin Tasks: Recheck Email, Sort WXR Inbox, QC Log Fully Annotated'],
+ ['1740','Create New Daily Task List'],
+ ['1745','Insert Personal Criteria into Bullet Tracker and Log Personal PT Time if Not Already Completed'],
+ ['1750','Clean, Organize, and Sanitize Workstation'],
+ ['1800','Provide Oncoming Shift Change Briefing (see Shift Change Checklist)']
+];
+const nightTasks = [
+ ['1800','Check MARSS — Actively Monitoring Applicable Alerts'],
+ ['1800','Run MIDDS Command HOWAREWE — Status Current'],
+ ['1800','Check Forecaster Sequencer — Daily Playlist Displaying Correct Products'],
+ ['1800','Ensure KCOF/KXMR/KTTS Obs Longline Dissemination (AWC) — Determine Necessity of Augmentation'],
+ ['1815','Check WXR Email, WXR Calendar, and Personal Email'],
+ ['1830','Verify Previous Shift Publication, Horizontal Consistency (WWAs, 24/7, TAF, MWP), and Fill Out QCC for Previous Shift — Check and Sign Off Current Shift Prior-Day Errors; Check and Sign Off Personal Prior-Day Errors'],
+ ['1845','Change Display on Daily Playlist MIDDS Satellite Imagery to Infrared','Eastern Standard Time only'],
+ ['1900','Perform Security and Required RAM Checks'],
+ ['1900 EDT / 2000 EST','Run MIDDS Command EG — Reset Zulu Daily Wind Graph'],
+ ['2000','QA and Transmit 24-Hour Forecast Update (2000L)'],
+ ['2200','QA and Transmit 02Z/03Z TAF'],
+ ['2200','QA and Transmit OTAC MWPs if needed'],
+ ['2300','QA and Transmit Tropical Distribution Email if needed'],
+ ['0000','QA and Transmit 24-Hour Forecast Update (0000L)'],
+ ['0030','Perform Radio Check and Annotate in Shift Change Log — If AFLD Odd Hours Applicable'],
+ ['0130','Review, Make Required Annotations, and Submit 3813s'],
+ ['0400','QA and Transmit 24-Hour Forecast Update (0400L)'],
+ ['0415','Ensure areas around the snack bar and microwave are clean and neat','Sundays only'],
+ ['0500','QA and Transmit Tropical Distribution Email if needed'],
+ ['0515','Complete Entering All Required WWA Actions — Justification, Verification, and Checklist Count'],
+ ['0525','Verify GitHub Products Current — Delete Old Products'],
+ ['0530','Verify and Complete Admin Tasks: Recheck Email, Sort WXR Inbox, QC Log Fully Annotated'],
+ ['0545','Insert Personal Criteria into Bullet Tracker and Log Personal PT Time if Not Already Completed'],
+ ['0550','Clean, Organize, and Sanitize Workstation'],
+ ['0600','QA and Transmit 10Z/11Z TAF'],
+ ['0600','QA and Transmit DTAC MWPs'],
+ ['0600','Provide Oncoming Shift Change Briefing (see Shift Change Checklist)']
+];
+const radioFrequencies = ['123.225 MHz', '225.05 MHz'];
+let dbRef = null, syncTimer = null, remoteApplying = false, database = null;
+
+const $ = id => document.getElementById(id);
+const fieldIds = () => ['shiftSupervisor','dutyForecasters','radio123225Initials','radio123225Status','radio123225Clarity','radio22505Initials','radio22505Status','radio22505Clarity','shiftNotes', ...activeTasks().map((_, i) => taskId(i))];
+const activeTasks = () => $('shiftType').value === 'day' ? dayTasks : nightTasks;
+const taskId = index => `task-${$('shiftType').value}-${index}`;
+const storageKey = () => `woc-checklist:${$('shiftDate').value}:${$('shiftType').value}`;
+const shiftKey = () => `${$('shiftDate').value}/${$('shiftType').value}`;
+const cleanKey = value => String(value || '').replace(/[^a-zA-Z0-9_-]/g, '_');
+
+function setToday() { const d = new Date(); $('shiftDate').value = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+function renderRadioChecks() {
+  $('radioChecks').innerHTML = radioFrequencies.map((frequency, index) => {
+    const key = index === 0 ? '123225' : '22505';
+    return `<article class="radio-card"><h3>Radio Check — ${frequency}</h3><div class="grid" style="grid-template-columns:repeat(3,minmax(100px,1fr));"><label>Initials<input id="radio${key}Initials" type="text" autocomplete="off" maxlength="20"></label><label>Status<select id="radio${key}Status"><option value="">Select</option><option>Complete</option><option>Unable to Complete</option><option>Not Required</option></select></label><label>Line Clarity<select id="radio${key}Clarity"><option value="">Select</option><option>Clear</option><option>Readable</option><option>Unclear</option><option>No Contact</option></select></label></div></article>`;
+  }).join('');
+}
+function renderTasks() {
+  const title = $('shiftType').value === 'day' ? 'Day Shift Tasks (0600–1800)' : 'Night Shift Tasks (1800–0600)';
+  $('taskContainer').innerHTML = `<div class="shift-heading"><h2>${title}</h2><span>Check items when complete</span></div><div class="task-list">${activeTasks().map((task, index) => `<div class="task" id="row-${taskId(index)}"><input id="${taskId(index)}" data-field="${taskId(index)}" type="checkbox" aria-label="Complete: ${task[0]} ${task[1]}"><label class="task-time" for="${taskId(index)}">${task[0]}</label><label class="task-text" for="${taskId(index)}">${task[1]}</label>${task[2] ? `<span class="conditional">${task[2]}</span>` : ''}</div>`).join('')}</div>`;
+}
+function captureState() {
+  const state = {};
+  fieldIds().forEach(id => { const el = $(id); if (el) state[id] = el.type === 'checkbox' ? el.checked : el.value; });
+  return state;
+}
+function applyState(state) {
+  remoteApplying = true;
+  fieldIds().forEach(id => { const el = $(id); if (!el) return; if (el.type === 'checkbox') el.checked = Boolean(state[id]); else el.value = state[id] || ''; });
+  remoteApplying = false;
+  updateProgress();
+}
+function saveLocal() { localStorage.setItem(storageKey(), JSON.stringify(captureState())); }
+function loadLocal() { try { applyState(JSON.parse(localStorage.getItem(storageKey()) || '{}')); } catch (_) { applyState({}); } }
+function updateProgress() {
+  const tasks = activeTasks(); const done = tasks.filter((_, i) => $(taskId(i))?.checked).length;
+  $('progressBar').max = tasks.length; $('progressBar').value = done; $('progressText').textContent = `${done} / ${tasks.length} tasks complete`;
+  tasks.forEach((_, i) => { const row = $(`row-${taskId(i)}`); if (row) row.classList.toggle('done', Boolean($(taskId(i))?.checked)); });
+}
+function handleInput() {
+  if (remoteApplying) return;
+  saveLocal(); updateProgress(); queueRemoteSave();
+}
+function loadSelectedShift() { detachSync(); renderRadioChecks(); renderTasks(); loadLocal(); bindFormInputs(); connectSync(); }
+function bindFormInputs() { document.querySelectorAll('input:not(#shiftDate), select:not(#shiftType), textarea').forEach(el => { el.addEventListener('input', handleInput); el.addEventListener('change', handleInput); }); }
+function updateBadge(text, type='') { const badge = $('syncBadge'); badge.textContent = text; badge.className = `sync-badge ${type}`; }
+function detachSync() { if (dbRef) dbRef.off(); dbRef = null; }
+function queueRemoteSave() { if (!dbRef) return; clearTimeout(syncTimer); syncTimer = setTimeout(() => dbRef.update(captureState()).catch(() => updateBadge('Sync error','error')), 250); }
+function addScript(src) { return new Promise((resolve,reject) => { const s=document.createElement('script'); s.src=src; s.onload=resolve; s.onerror=reject; document.head.appendChild(s); }); }
+async function connectSync() {
+  if (!realtimeConfig.enabled) { updateBadge('Local-only mode'); return; }
+  try {
+    updateBadge('Connecting…');
+    if (!window.firebase) { await addScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js'); await addScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js'); }
+    if (!firebase.apps.length) firebase.initializeApp(realtimeConfig.firebaseConfig);
+    database = firebase.database();
+    dbRef = database.ref(`${cleanKey(realtimeConfig.databaseRoot)}/${shiftKey()}`);
+    dbRef.on('value', snap => { const state = snap.val(); if (state) { applyState(state); saveLocal(); } else { dbRef.set(captureState()); } updateBadge('Live sync connected','connected'); }, () => updateBadge('Sync access denied','error'));
+  } catch (error) { console.error(error); updateBadge('Sync unavailable','error'); }
+}
+function wrapText(text, max=94) { const words = String(text || '').replace(/\s+/g,' ').trim().split(' '); const lines=[]; let line=''; words.forEach(word => { if ((line + ' ' + word).trim().length > max && line) { lines.push(line); line=word; } else line = (line+' '+word).trim(); }); if(line) lines.push(line); return lines; }
+function pdfEscape(value) { return String(value).normalize('NFKD').replace(/[^\x20-\x7E]/g,'?').replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)'); }
+function createPdf(lines) {
+  const pages=[]; for(let i=0;i<lines.length;i+=54) pages.push(lines.slice(i,i+54));
+  const objects=[]; const add=o => { objects.push(o); return objects.length; };
+  const catalog=add(''); const pagesObj=add(''); const font=add('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>');
+  const pageNums=[];
+  pages.forEach(pageLines => { const content = `BT\n/F1 9 Tf\n36 756 Td\n12 TL\n${pageLines.map(line => `(${pdfEscape(line)}) Tj\nT*`).join('\n')}\nET`; const contentNum=add(`<< /Length ${content.length} >>\nstream\n${content}\nendstream`); const pageNum=add(`<< /Type /Page /Parent ${pagesObj} 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 ${font} 0 R >> >> /Contents ${contentNum} 0 R >>`); pageNums.push(pageNum); });
+  objects[pagesObj-1] = `<< /Type /Pages /Kids [${pageNums.map(n=>`${n} 0 R`).join(' ')}] /Count ${pageNums.length} >>`;
+  objects[catalog-1] = `<< /Type /Catalog /Pages ${pagesObj} 0 R >>`;
+  let pdf='%PDF-1.4\n%PDFGEN\n'; const offsets=[0]; objects.forEach((obj,i)=> { offsets.push(pdf.length); pdf += `${i+1} 0 obj\n${obj}\nendobj\n`; }); const xref=pdf.length; pdf += `xref\n0 ${objects.length+1}\n0000000000 65535 f \n${offsets.slice(1).map(o=>String(o).padStart(10,'0')+' 00000 n \n').join('')}trailer\n<< /Size ${objects.length+1} /Root ${catalog} 0 R >>\nstartxref\n${xref}\n%%EOF`;
+  return new Blob([pdf], {type:'application/pdf'});
+}
+function downloadPdf() {
+  const now = new Date(); const tasks = activeTasks(); const done = tasks.filter((_,i)=>$(taskId(i)).checked).length;
+  const lines = [
+    'WEATHER OPERATIONS CENTER - COMPLETED SHIFT CHECKLIST',
+    `Checklist Date: ${$('shiftDate').value}    Shift: ${$('shiftType').value.toUpperCase()}`,
+    `Generated: ${now.toLocaleString()}`,
+    '', `Shift Supervisor: ${$('shiftSupervisor').value || 'Not entered'}`, `Duty Forecasters: ${$('dutyForecasters').value || 'Not entered'}`,
+    '', 'RADIO CHECKS'
+  ];
+  [['123.225 MHz','123225'],['225.05 MHz','22505']].forEach(([freq,key]) => lines.push(`${freq}: Initials: ${$('radio'+key+'Initials').value || 'Not entered'} | Status: ${$('radio'+key+'Status').value || 'Not entered'} | Line Clarity: ${$('radio'+key+'Clarity').value || 'Not entered'}`));
+  lines.push('', `TASK COMPLETION: ${done} of ${tasks.length} complete`, '', $('shiftType').value === 'day' ? 'DAY SHIFT TASKS' : 'NIGHT SHIFT TASKS');
+  tasks.forEach((task,i) => { const prefix = $(taskId(i)).checked ? '[X]' : '[ ]'; wrapText(`${prefix} ${task[0]} - ${task[1]}${task[2] ? ` (${task[2]})` : ''}`).forEach((line,j)=>lines.push(j===0?line:'    '+line)); });
+  lines.push('', 'SHIFT CHANGE / HANDOFF NOTES'); const notes = $('shiftNotes').value || 'None entered'; wrapText(notes).forEach(line=>lines.push(line));
+  const filename = `WOC_Shift_Checklist_${$('shiftDate').value || 'undated'}_${$('shiftType').value}.pdf`;
+  const url=URL.createObjectURL(createPdf(lines)); const link=document.createElement('a'); link.href=url; link.download=filename; document.body.appendChild(link); link.click(); link.remove(); setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function clearShift() { if (!confirm('Clear all fields and task selections for this date and shift?')) return; applyState({}); localStorage.removeItem(storageKey()); if (dbRef) dbRef.remove().catch(()=>updateBadge('Sync error','error')); }
+function markAll() { activeTasks().forEach((_,i)=>$(taskId(i)).checked=true); handleInput(); }
+$('shiftDate').addEventListener('change', loadSelectedShift); $('shiftType').addEventListener('change', loadSelectedShift); $('downloadPdf').addEventListener('click', downloadPdf); $('clearShift').addEventListener('click', clearShift); $('markAll').addEventListener('click', markAll);
+setToday(); renderRadioChecks(); renderTasks(); loadLocal(); bindFormInputs(); updateProgress(); connectSync();
+</script>
+</body>
+</html>
